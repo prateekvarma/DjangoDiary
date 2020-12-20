@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from . models import Entry
 from .forms import EntryForm
 
@@ -12,5 +12,14 @@ def index(request):
 
 
 def add(request):
-    form = EntryForm()
-    return render(request, 'entries/add.html', {'form': form})
+    if request.method == 'POST':
+        # instantiate EntryForm with request data
+        form = EntryForm(request.POST)
+        # check if form data is valid
+        if form.is_valid():
+            form.save()  # simple & easy as we're using ModelForm
+            return redirect('home')
+    else:
+        # it's a GET request, so initialize the form and send to template
+        form = EntryForm()
+        return render(request, 'entries/add.html', {'form': form})
